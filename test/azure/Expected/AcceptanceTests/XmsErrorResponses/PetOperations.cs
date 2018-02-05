@@ -187,9 +187,9 @@ namespace Fixtures.Azure.AcceptanceTestsXmsErrorResponses
             var _result = new AzureOperationResponse<Pet>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
-            if (_httpResponse.Headers.Contains("x-ms-request-id"))
+            if (_httpResponse.Headers.Contains("get-pet-request"))
             {
-                _result.RequestId = _httpResponse.Headers.GetValues("x-ms-request-id").FirstOrDefault();
+                _result.RequestId = _httpResponse.Headers.GetValues("get-pet-request").FirstOrDefault();
             }
             // Deserialize Response
             if ((int)_statusCode == 200)
@@ -351,9 +351,9 @@ namespace Fixtures.Azure.AcceptanceTestsXmsErrorResponses
                 catch(CloudException ex)
                 {
                     // set the request id to exception
-                    if (_httpResponse.Headers.Contains("x-ms-request-id"))
+                    if (_httpResponse.Headers.Contains("get-pet-request"))
                     {
-                        ex.RequestId = _httpResponse.Headers.GetValues("x-ms-request-id").FirstOrDefault();
+                        ex.RequestId = _httpResponse.Headers.GetValues("get-pet-request").FirstOrDefault();
                     }
                     throw ex;
                 }
