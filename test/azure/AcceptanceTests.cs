@@ -3,12 +3,7 @@
 
 // TODO: file length is getting excessive.
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Net.Http;
+using AutoRest.CSharp.Tests.Utilities;
 using Fixtures.Azure.AzureBodyDuration;
 using Fixtures.Azure.AzureParameterGrouping;
 using Fixtures.Azure.AzureParameterGrouping.Models;
@@ -25,12 +20,18 @@ using Fixtures.Azure.SubscriptionIdApiVersion;
 using Fixtures.Azure.AcceptanceTestsXmsErrorResponses;
 using Fixtures.Azure.AcceptanceTestsXmsErrorResponses.Models;
 using Xunit;
-using AutoRest.CSharp.Tests.Utilities;
 using AutoRest.CSharp.Tests;
 using Microsoft.Rest;
 using Microsoft.Rest.Azure;
 using Microsoft.Rest.Azure.OData;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using Xunit;
 using ValidationException = Microsoft.Rest.ValidationException;
 
 namespace AutoRest.CSharp.Azure.Tests
@@ -211,10 +212,13 @@ namespace AutoRest.CSharp.Azure.Tests
                 exception = Assert.Throws<CloudException>(() => client.LROs.PostAsyncRetrycanceled());
                 Assert.Contains("Long running operation failed with status 'Canceled'", exception.Message,
                     StringComparison.Ordinal);
+
+
                 Product prod = client.LROs.PostAsyncRetrySucceeded();
                 Assert.Equal("100", prod.Id);
                 prod = client.LROs.PostAsyncNoRetrySucceeded();
                 Assert.Equal("100", prod.Id);
+
                 var sku = client.LROs.Post200WithPayload();
                 Assert.Equal("1", sku.Id);
 
@@ -276,7 +280,8 @@ namespace AutoRest.CSharp.Azure.Tests
                     new TokenCredentials(Guid.NewGuid().ToString())))
             {
                 client.LongRunningOperationRetryTimeout = 0;
-                CloudException exception =
+
+                var exception =
                     Assert.Throws<CloudException>(
                         () => client.LROSADs.PutNonRetry400(new Product { Location = "West US" }));
 
@@ -340,11 +345,9 @@ namespace AutoRest.CSharp.Azure.Tests
                 var invalidHeader = Assert.Throws<SerializationException>(() => client.LROSADs.Delete202RetryInvalidHeader());
                 Assert.NotNull(invalidHeader.Message);
 
-
                 var invalidAsyncHeader =
                     Assert.Throws<SerializationException>(() => client.LROSADs.DeleteAsyncRelativeRetryInvalidHeader());
                 Assert.NotNull(invalidAsyncHeader.Message);
-
 
                 invalidHeader = Assert.Throws<SerializationException>(() => client.LROSADs.Post202RetryInvalidHeader());
                 Assert.NotNull(invalidHeader.Message);
@@ -358,19 +361,20 @@ namespace AutoRest.CSharp.Azure.Tests
                         () => client.LROSADs.DeleteAsyncRelativeRetryInvalidJsonPolling());
                 Assert.NotNull(invalidPollingBody.Message);
 
-                invalidPollingBody =
+                var invalidPollingBody2 =
                     Assert.Throws<CloudException>(
                         () => client.LROSADs.PostAsyncRelativeRetryInvalidJsonPolling());
-                Assert.NotNull(invalidPollingBody.Message);
+                Assert.NotNull(invalidPollingBody2.Message);
 
                 client.LROSADs.Delete204Succeeded();
+
                 var noStatusInPollingBody =
                     Assert.Throws<CloudException>(() => client.LROSADs.DeleteAsyncRelativeRetryNoStatus());
                 Assert.Equal("The response from long running operation does not contain a body.",
                     noStatusInPollingBody.Message);
 
-                var invalidOperationEx = Assert.Throws<ValidationException> (() => client.LROSADs.Post202NoLocation());
-                Assert.Contains("Location header is missing from long running operation.", invalidOperationEx.Message,
+                var invalidOperationEx = Assert.Throws<ValidationException>(() => client.LROSADs.Post202NoLocation());
+                Assert.Contains("Recommended patterns: POST-202-LocationHeder(Prefered)/AzureAsyncOperationHeader", invalidOperationEx.Message,
                     StringComparison.Ordinal);
                 
                 exception = Assert.Throws<CloudException>(() => client.LROSADs.PostAsyncRelativeRetryNoPayload());
